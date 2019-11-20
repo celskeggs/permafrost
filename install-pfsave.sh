@@ -12,6 +12,9 @@ Description=Backup Executor
 
 [Service]
 ExecStart=$PWD/pfsave.py
+StandardInput=null
+StandardOutput=journal
+StandardError=inherit
 
 [Install]
 WantedBy=default.target

@@ -12,6 +12,9 @@ Description=Backup Acceptor
 
 [Service]
 ExecStart=$PWD/pfaccept.py
+StandardInput=null
+StandardOutput=journal
+StandardError=inherit
 
 [Install]
 WantedBy=default.target
