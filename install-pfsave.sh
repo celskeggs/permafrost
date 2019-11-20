@@ -3,6 +3,7 @@ set -e -u -o pipefail
 cd "$(dirname "$0")"
 SYSTEMD_SVC="$HOME/.config/systemd/user"
 
+mkdir -p "$HOME/bkstage"
 mkdir -p "${SYSTEMD_SVC}"
 
 cat >"${SYSTEMD_SVC}/pfsave.service" <<EOF
