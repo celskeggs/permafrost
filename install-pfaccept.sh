@@ -3,6 +3,8 @@ set -e -u -o pipefail
 cd "$(dirname "$0")"
 SYSTEMD_SVC="$HOME/.config/systemd/user"
 
+mkdir -p "${SYSTEMD_SVC}"
+
 cat >"${SYSTEMD_SVC}/pfaccept.service" <<EOF
 [Unit]
 Description=Backup Acceptor
