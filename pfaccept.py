@@ -43,7 +43,8 @@ def get_webhook():
 def notify(message, webhook):
 	print(message)
 	r = requests.post(webhook, data=json.dumps({"text": message}))
-	print("slack", r.text, r.status_code)
+	if r.status_code != 200:
+		raise Exception("could not send to slack: %s" % repr(r.text))
 
 # via https://stackoverflow.com/a/1094933
 def sizeof_fmt(num, suffix='B'):
