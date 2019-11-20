@@ -15,7 +15,16 @@ TODO
 First, generate a new password in your password manager to encrypt this particular VM's backups.
 (Make sure you have a backup of your password manager that isn't stored in your backups, to avoid a chicken-and-egg scenario.)
 
-Copy the key into /home/user/.permafrostkey in the VM you want to backup.
+Copy the password you generated into /home/user/.permafrostkey in the VM you want to backup.
+
+Next, you need to grant the appropriate permissions for the VM to automatically copy backup files around.
+Edit `/etc/qubes-rpc/policy/qubes.Filecopy` in dom0 to add the following line:
+
+    [YOURVM]	permafrost	allow
+
+Make sure to add it before the `$anyvm	$anyvm	ask` line.
+
+Now install the software:
 
     $ cd /home/user/
     $ git clone https://github.com/celskeggs/permafrost

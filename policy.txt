@@ -1,8 +1,0 @@
-Instead of:
-
-    $anyvm	$anyvm	ask
-
-Use:
-
-    [VM NAME]	permafrost	allow
-    $anyvm	$anyvm	ask
