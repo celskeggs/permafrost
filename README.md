@@ -4,11 +4,35 @@ This is a tool to facilitate making secure automated backups of parts of Qubes V
 
 ## Setting up template VM
 
-    $ sudo apt install python3-gdbm
+    $ sudo apt install duplicity python3-gdbm python3-boto3
 
 ## Setting up permafrost VM
 
-TODO
+First, get a new Slack incoming webhook and paste the URL into `/home/user/.permafrostwebhook`.
+
+Second, create a new S3 bucket and get an access key. Put the information into `/home/user/.permafrostremote` in the following JSON format:
+
+    {
+      "url": "<region url>",
+      "bucket": "<name>",
+      "key": "<key>",
+      "secret": "<secret>"
+    }
+
+Third, install the software:
+
+    $ cd /home/user/
+    $ git clone https://github.com/celskeggs/permafrost
+    $ cd permafrost
+    $ ./install-pfaccept.sh
+    $ ./install-pfupload.sh
+
+Confirm that the services are running:
+
+    $ systemctl status --user pfaccept.service
+    $ systemctl status --user pfupload.service
+
+Once you've installed a client VM, you should start seeing messages pop up reporting that the accept and upload scripts worked.
 
 ## Setting up a client VM
 
