@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 import os
-import json
-import requests
 
-WEBHOOK_PATH="/home/user/.permafrostwebhook"
+import util
 
 def check_incoming(source, dest):
 	print("checking incoming files...")
@@ -36,27 +34,9 @@ def check_incoming(source, dest):
 		counts[svm] = (count, octets)
 	return errors, counts
 
-def get_webhook():
-        with open(WEBHOOK_PATH, "r") as f:
-                return f.read().strip()
-
-def notify(message, webhook):
-	print(message)
-	r = requests.post(webhook, data=json.dumps({"text": message}))
-	if r.status_code != 200:
-		raise Exception("could not send to slack: %s" % repr(r.text))
-
-# via https://stackoverflow.com/a/1094933
-def sizeof_fmt(num, suffix='B'):
-    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
-        if abs(num) < 1024.0:
-            return "%3.1f%s%s" % (num, unit, suffix)
-        num /= 1024.0
-    return "%.1f%s%s" % (num, 'Yi', suffix)
-
 def main():
-	webhook = get_webhook()
-	errors, counts = check_incoming("/home/user/QubesIncoming", "/home/user/staging")
+	notify = util.Notifier()
+	errors, counts = check_incoming("/home/user/QubesIncoming", util.STAGING_PATH)
 	lines = []
 	if errors:
 		lines += ["encountered %d errors:" % len(errors)]
@@ -65,11 +45,11 @@ def main():
 	if counts:
 		tcount = sum(count for count, size in counts.values())
 		tsize = sum(size for count, size in counts.values())
-		lines += ["accepted %d files from %d VMs (%s)" % (tcount, len(counts), sizeof_fmt(tsize))]
+		lines += ["accepted %d files from %d VMs (%s)" % (tcount, len(counts), util.sizeof_fmt(tsize))]
 		for vm, (count, size) in sorted(counts.items()):
-			lines += [" * %s: %d (%s)" % (repr(vm), count, sizeof_fmt(tsize))]
+			lines += [" * %s: %d (%s)" % (repr(vm), count, util.sizeof_fmt(tsize))]
 	if lines:
-		notify("\n".join(lines), webhook)
+		notify.send("\n".join(lines))
 
 if __name__ == "__main__":
 	main()
