@@ -35,43 +35,21 @@ def backup():
 		passphrase = f.read().strip()
 	print("beginning...")
 	with dbm.gnu.open(STAGE_INDEX, "cs") as db:
-		if db.get("state", b"idle") != b"idle":
-			raise Exception("index not idle: %s" % db["state"])
-		db["state"] = "active"
 		try:
 			duplicity_backup(TARGET, STAGING, passphrase)
 		except Exception as e:
-			db["state"] = "backup-failed"
 			raise e
 		for f in os.listdir(STAGING):
 			fpath = os.path.join(STAGING, f)
-			if f == "index" or f == "state":
+			if f == "index":
 				continue
 			if f not in db:
 				try:
 					qvm_copy(fpath, TARGET_VM)
 				except Exception as e:
-					db["state"] = "copy-failed"
 					raise e
 				db[f] = "ok"
-		db["state"] = "idle"
 	print("finished!")
 
-def recover():
-	with dbm.gnu.open(STAGE_INDEX, "cs") as db:
-		if db.get("state", "idle") == "idle":
-			raise Exception("index already idle")
-		db["state"] = "idle"
-	print("recovered.")
-
-def main():
-	parser = argparse.ArgumentParser(description='Back up files.')
-	parser.add_argument('--recover', action="store_true", help='reset state to idle')
-	args = parser.parse_args()
-	if args.recover:
-		recover()
-	else:
-		backup()
-
 if __name__ == "__main__":
-	main()
+	backup()
