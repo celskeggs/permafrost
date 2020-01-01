@@ -47,7 +47,7 @@ def main():
 		tsize = sum(size for count, size in counts.values())
 		lines += ["accepted %d files from %d VMs (%s)" % (tcount, len(counts), util.sizeof_fmt(tsize))]
 		for vm, (count, size) in sorted(counts.items()):
-			lines += [" * %s: %d (%s)" % (repr(vm), count, util.sizeof_fmt(tsize))]
+			lines += [" * %s: %d (%s)" % (repr(vm), count, util.sizeof_fmt(size))]
 	if lines:
 		notify.send("\n".join(lines))
 
