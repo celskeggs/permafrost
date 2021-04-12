@@ -3,6 +3,11 @@ import os
 
 import util
 
+def check_match(fpath, dpath):
+	with open(fpath, "rb") as f1:
+		with open(dpath, "rb") as f2:
+			return f1.read() == f2.read()
+
 def check_incoming(source, dest):
 	print("checking incoming files...")
 	errors = []
@@ -18,7 +23,11 @@ def check_incoming(source, dest):
 				errors.append("skipping directory %s" % repr(fpath))
 				continue
 			if os.path.exists(dpath):
-				errors.append("skipping duplicate file %s" % repr(fpath))
+				if check_match(fpath, dpath):
+					errors.append("skipping matching duplicate file %s by deleting duplicate" % repr(fpath))
+					os.remove(fpath)
+				else:
+					errors.append("skipping NON-MATCHING duplicate file %s" % repr(fpath))
 				continue
 			size = os.stat(fpath).st_size
 			if size == 0:

@@ -15,6 +15,7 @@ ExecStart=$PWD/pfsave.py
 StandardInput=null
 StandardOutput=journal
 StandardError=inherit
+LimitNOFILE=2000
 
 [Install]
 WantedBy=default.target
