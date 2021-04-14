@@ -1,25 +1,14 @@
 #!/usr/bin/env python3
 import os
 
-import boto3
 import requests
 
 import util
 
-def connect():
-	j = util.load_secret(".permafrostremote", use_json=True)
-	if type(j) != dict:
-		raise Exception("invalid format of remote config")
-	if {k: type(v) for k, v in j.items()} != {"key": str, "secret": str, "url": str, "bucket": str}:
-		raise Exception("invalid format of remote config")
-	session = boto3.session.Session(region_name='nyc3', aws_access_key_id=j["key"], aws_secret_access_key=j["secret"])
-	s3 = session.resource("s3", endpoint_url=j["url"])
-	return s3.Bucket(j["bucket"])
-
 def upload_all(local_path):
 	if not os.path.isdir(local_path):
 		raise Exception("nonexistent staging directory")
-	bucket = connect()
+	bucket = util.connect_bucket()
 	uploaded = {obj.key: obj.size for obj in bucket.objects.all()}
 	total_count, total_size = 0, 0
 	for path, folders, files in os.walk(local_path):

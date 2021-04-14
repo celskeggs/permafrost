@@ -1,8 +1,12 @@
-import os
 import json
+import os
+import subprocess
+
+import boto3
 import requests
 
 STAGING_PATH = "/home/user/staging"
+UNSTAGING_PATH = "/home/user/unstaging"
 WEBHOOK_NAME = ".permafrostwebhook"
 
 def load_secret(name, use_json=False):
@@ -17,6 +21,22 @@ def load_secret(name, use_json=False):
 			return json.load(f)
 		else:
 			return f.read().strip()
+
+def connect_bucket():
+	j = load_secret(".permafrostremote", use_json=True)
+	if type(j) != dict:
+		raise Exception("invalid format of remote config")
+	if {k: type(v) for k, v in j.items()} != {"key": str, "secret": str, "url": str, "bucket": str}:
+		raise Exception("invalid format of remote config")
+	session = boto3.session.Session(region_name='nyc3', aws_access_key_id=j["key"], aws_secret_access_key=j["secret"])
+	s3 = session.resource("s3", endpoint_url=j["url"])
+	return s3.Bucket(j["bucket"])
+
+def qvm_copy(path, target_vm):
+	print("copying file", path, "to vm", target_vm)
+	nenv = dict(os.environ)
+	nenv["PROGRESS_TYPE"] = "none"
+	subprocess.check_call(["/usr/lib/qubes/qrexec-client-vm", target_vm, "qubes.Filecopy", "/usr/lib/qubes/qfile-agent", path], env=nenv)
 
 class Notifier:
 	def __init__(self):

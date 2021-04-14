@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
+import argparse
 import os
 import subprocess
+
 import dbm.gnu
-import argparse
+
+import util
 
 def duplicity_backup(source, dest, passphrase):
 	print("performing duplicity backup")
@@ -17,12 +20,6 @@ def duplicity_backup(source, dest, passphrase):
 		print("no changes to backup")
 		return
 	subprocess.check_call(["duplicity"] + args, env=nenv)
-
-def qvm_copy(path, target_vm):
-	print("copying file", path, "to vm", target_vm)
-	nenv = dict(os.environ)
-	nenv["PROGRESS_TYPE"] = "none"
-	subprocess.check_call(["/usr/lib/qubes/qrexec-client-vm", target_vm, "qubes.Filecopy", "/usr/lib/qubes/qfile-agent", path], env=nenv)
 
 PASSFILE="/home/user/.permafrostkey"
 TARGET="/home/user/Materials"
@@ -45,7 +42,7 @@ def backup():
 				continue
 			if f not in db:
 				try:
-					qvm_copy(fpath, TARGET_VM)
+					util.qvm_copy(fpath, TARGET_VM)
 				except Exception as e:
 					raise e
 				db[f] = "ok"
