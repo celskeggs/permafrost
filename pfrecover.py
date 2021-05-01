@@ -63,8 +63,10 @@ def backup():
 	msg("finished restore!")
 	if do_checksum:
 		print("===== checksums =====")
+		sys.stdout.flush()
 		subprocess.check_call(["find", "-type", "f", "-exec", "sha256sum", "{}", ";"], cwd=TARGET)
 		print("===== checksums =====")
+		sys.stdout.flush()
 
 if __name__ == "__main__":
 	for flag in sys.argv[1:]:
